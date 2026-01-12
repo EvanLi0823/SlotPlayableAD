@@ -1,0 +1,55 @@
+{
+  "name": "example_curve",
+  "description": "单条曲线配置示例 - 用于测试和参考",
+  "interpolationMode": "hermite",
+  "keyframes": [
+    {
+      "time": 0.0,
+      "value": 0.0,
+      "inTangent": 0.0,
+      "outTangent": 0.5,
+      "comment": "起点：静止开始，准备加速"
+    },
+    {
+      "time": 0.3,
+      "value": 0.1,
+      "inTangent": 0.8,
+      "outTangent": 0.8,
+      "comment": "加速结束，进入匀速"
+    },
+    {
+      "time": 1.5,
+      "value": 1.0,
+      "inTangent": 0.8,
+      "outTangent": 0.4,
+      "comment": "匀速结束，开始减速"
+    },
+    {
+      "time": 2.0,
+      "value": 1.15,
+      "inTangent": 0.2,
+      "outTangent": -1.0,
+      "comment": "超过目标位置，准备回弹"
+    },
+    {
+      "time": 2.15,
+      "value": 1.1,
+      "inTangent": -0.5,
+      "outTangent": 0.0,
+      "comment": "回弹完成，最终停止位置"
+    }
+  ],
+  "metadata": {
+    "author": "Example",
+    "version": "1.0",
+    "tags": ["example", "tutorial"],
+    "usage": "这是一个示例曲线配置文件，展示了如何定义关键帧和切线",
+    "notes": [
+      "time: 时间点（秒）",
+      "value: 位移值（米，实际使用时需要乘以1000转为像素）",
+      "inTangent: 入切线斜率（控制曲线进入该点的形状）",
+      "outTangent: 出切线斜率（控制曲线离开该点的形状）",
+      "interpolationMode: hermite（平滑）/ linear（线性）/ constant（阶梯）"
+    ]
+  }
+}

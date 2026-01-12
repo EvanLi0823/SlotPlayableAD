@@ -1,0 +1,245 @@
+{
+  "name": "standard_5reel_curves",
+  "version": "1.0.0",
+  "curves": [
+    {
+      "name": "reel_0_standard",
+      "description": "第1列标准转动曲线（最先停止）",
+      "interpolationMode": "hermite",
+      "keyframes": [
+        {
+          "time": 0.0,
+          "value": 0.0,
+          "inTangent": 0,
+          "outTangent": 0.4
+        },
+        {
+          "time": 0.2,
+          "value": 0.08,
+          "inTangent": 0.8,
+          "outTangent": 0.8
+        },
+        {
+          "time": 1.2,
+          "value": 0.88,
+          "inTangent": 0.8,
+          "outTangent": 0.4
+        },
+        {
+          "time": 1.7,
+          "value": 1.088,
+          "inTangent": 0.16,
+          "outTangent": -0.8
+        },
+        {
+          "time": 1.85,
+          "value": 1.08,
+          "inTangent": -0.4,
+          "outTangent": 0
+        }
+      ],
+      "metadata": {
+        "author": "CurvePresets",
+        "tags": ["standard", "reel0"],
+        "symbolHeight": 100,
+        "accelerationTime": 0.2,
+        "normalSpeed": 800,
+        "decelerationTime": 0.5,
+        "bounceDistance": 8,
+        "bounceDuration": 0.15
+      }
+    },
+    {
+      "name": "reel_1_standard",
+      "description": "第2列标准转动曲线（延迟0.2秒停止）",
+      "interpolationMode": "hermite",
+      "keyframes": [
+        {
+          "time": 0.0,
+          "value": 0.0,
+          "inTangent": 0,
+          "outTangent": 0.4
+        },
+        {
+          "time": 0.2,
+          "value": 0.08,
+          "inTangent": 0.8,
+          "outTangent": 0.8
+        },
+        {
+          "time": 1.2,
+          "value": 0.88,
+          "inTangent": 0.8,
+          "outTangent": 0.4
+        },
+        {
+          "time": 1.9,
+          "value": 1.088,
+          "inTangent": 0.16,
+          "outTangent": -0.8
+        },
+        {
+          "time": 2.05,
+          "value": 1.08,
+          "inTangent": -0.4,
+          "outTangent": 0
+        }
+      ],
+      "metadata": {
+        "author": "CurvePresets",
+        "tags": ["standard", "reel1"],
+        "stopDelay": 0.2
+      }
+    },
+    {
+      "name": "reel_2_standard",
+      "description": "第3列标准转动曲线（延迟0.4秒停止）",
+      "interpolationMode": "hermite",
+      "keyframes": [
+        {
+          "time": 0.0,
+          "value": 0.0,
+          "inTangent": 0,
+          "outTangent": 0.4
+        },
+        {
+          "time": 0.2,
+          "value": 0.08,
+          "inTangent": 0.8,
+          "outTangent": 0.8
+        },
+        {
+          "time": 1.2,
+          "value": 0.88,
+          "inTangent": 0.8,
+          "outTangent": 0.4
+        },
+        {
+          "time": 2.1,
+          "value": 1.088,
+          "inTangent": 0.16,
+          "outTangent": -0.8
+        },
+        {
+          "time": 2.25,
+          "value": 1.08,
+          "inTangent": -0.4,
+          "outTangent": 0
+        }
+      ],
+      "metadata": {
+        "author": "CurvePresets",
+        "tags": ["standard", "reel2"],
+        "stopDelay": 0.4
+      }
+    },
+    {
+      "name": "reel_3_standard",
+      "description": "第4列标准转动曲线（延迟0.6秒停止）",
+      "interpolationMode": "hermite",
+      "keyframes": [
+        {
+          "time": 0.0,
+          "value": 0.0,
+          "inTangent": 0,
+          "outTangent": 0.4
+        },
+        {
+          "time": 0.2,
+          "value": 0.08,
+          "inTangent": 0.8,
+          "outTangent": 0.8
+        },
+        {
+          "time": 1.2,
+          "value": 0.88,
+          "inTangent": 0.8,
+          "outTangent": 0.4
+        },
+        {
+          "time": 2.3,
+          "value": 1.088,
+          "inTangent": 0.16,
+          "outTangent": -0.8
+        },
+        {
+          "time": 2.45,
+          "value": 1.08,
+          "inTangent": -0.4,
+          "outTangent": 0
+        }
+      ],
+      "metadata": {
+        "author": "CurvePresets",
+        "tags": ["standard", "reel3"],
+        "stopDelay": 0.6
+      }
+    },
+    {
+      "name": "reel_4_standard",
+      "description": "第5列标准转动曲线（延迟0.8秒停止，最后一列）",
+      "interpolationMode": "hermite",
+      "keyframes": [
+        {
+          "time": 0.0,
+          "value": 0.0,
+          "inTangent": 0,
+          "outTangent": 0.4
+        },
+        {
+          "time": 0.2,
+          "value": 0.08,
+          "inTangent": 0.8,
+          "outTangent": 0.8
+        },
+        {
+          "time": 1.2,
+          "value": 0.88,
+          "inTangent": 0.8,
+          "outTangent": 0.4
+        },
+        {
+          "time": 2.5,
+          "value": 1.088,
+          "inTangent": 0.16,
+          "outTangent": -0.8
+        },
+        {
+          "time": 2.65,
+          "value": 1.08,
+          "inTangent": -0.4,
+          "outTangent": 0
+        }
+      ],
+      "metadata": {
+        "author": "CurvePresets",
+        "tags": ["standard", "reel4", "last"],
+        "stopDelay": 0.8
+      }
+    },
+    {
+      "name": "quick_stop",
+      "description": "快速停止曲线（EaseOutQuad）",
+      "interpolationMode": "hermite",
+      "keyframes": [
+        {
+          "time": 0.0,
+          "value": 0.0,
+          "inTangent": 0,
+          "outTangent": 4.0
+        },
+        {
+          "time": 0.5,
+          "value": 1.0,
+          "inTangent": 0,
+          "outTangent": 0
+        }
+      ],
+      "metadata": {
+        "author": "CurvePresets",
+        "tags": ["quickstop", "easeout"],
+        "easingType": "quad"
+      }
+    }
+  ]
+}

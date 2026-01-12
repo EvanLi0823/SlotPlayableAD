@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日志下载功能测试</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .test-section h2 {
+            color: #333;
+            margin-top: 0;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        }
+
+        #log-stats {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        #log-stats h3 {
+            margin-top: 0;
+            color: #667eea;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .stat-value {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        /* 日志下载面板样式 */
+        #log-download-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .log-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        #download-txt-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        #download-json-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        #clear-logs-btn {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        #log-stats-btn {
+            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        }
+
+        .log-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .log-btn:active {
+            transform: translateY(0);
+        }
+
+        #log-count {
+            color: white;
+            font-size: 12px;
+            text-align: center;
+            margin-top: 8px;
+            font-family: monospace;
+            padding: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .info-box h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+
+        .info-box ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .info-box li {
+            margin: 5px 0;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <!-- 日志下载面板 -->
+    <div id="log-download-panel">
+        <button id="download-txt-btn" class="log-btn">📄 Download TXT</button>
+        <button id="download-json-btn" class="log-btn">📋 Download JSON</button>
+        <button id="clear-logs-btn" class="log-btn">🗑️ Clear Logs</button>
+        <button id="log-stats-btn" class="log-btn">📊 Show Stats</button>
+        <div id="log-count">Logs: 0</div>
+    </div>
+
+    <div class="container">
+        <h1>🎮 浏览器日志下载功能测试</h1>
+
+        <div class="test-section">
+            <h2>📝 1. 生成测试日志</h2>
+            <p>点击下面的按钮生成不同类型的日志：</p>
+            <div class="button-group">
+                <button class="btn-primary" onclick="generateNormalLogs()">生成普通日志</button>
+                <button class="btn-success" onclick="generateInfoLogs()">生成信息日志</button>
+                <button class="btn-warning" onclick="generateWarningLogs()">生成警告日志</button>
+                <button class="btn-danger" onclick="generateErrorLogs()">生成错误日志</button>
+                <button class="btn-info" onclick="generateMixedLogs()">生成混合日志</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 2. 查看日志统计</h2>
+            <p>点击右上角的"📊 Show Stats"按钮，可以在浏览器控制台查看日志统计信息。</p>
+            <button class="btn-info" onclick="showStats()">显示统计（控制台）</button>
+            <button class="btn-primary" onclick="showStatsInPage()">显示统计（页面）</button>
+            <div id="log-stats"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>💾 3. 下载日志</h2>
+            <p>使用右上角的下载按钮可以将日志保存到本地：</p>
+            <div class="button-group">
+                <button class="btn-primary" onclick="downloadTxt()">下载为TXT</button>
+                <button class="btn-warning" onclick="downloadJson()">下载为JSON</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 4. 高级功能测试</h2>
+            <div class="button-group">
+                <button class="btn-info" onclick="searchLogs()">搜索日志（"test"）</button>
+                <button class="btn-success" onclick="filterErrorLogs()">过滤错误日志</button>
+                <button class="btn-primary" onclick="getRecentLogs()">获取最近10条</button>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h3>📚 使用说明</h3>
+            <ul>
+                <li><strong>自动收集：</strong>所有console日志（log, warn, error, info）都会被自动收集</li>
+                <li><strong>实时显示：</strong>右上角显示当前收集的日志数量，每秒自动更新</li>
+                <li><strong>下载格式：</strong>支持TXT和JSON两种格式</li>
+                <li><strong>容量限制：</strong>最多保存5000条日志，超出后自动删除最早的日志</li>
+                <li><strong>调试访问：</strong>可以在控制台通过<code>window.logManager</code>访问日志管理器</li>
+            </ul>
+        </div>
+
+        <div class="info-box">
+            <h3>🔧 控制台命令</h3>
+            <p>打开浏览器控制台（F12），可以使用以下命令：</p>
+            <ul>
+                <li><code>logManager.getAllLogs()</code> - 获取所有日志</li>
+                <li><code>logManager.getLogStats()</code> - 获取日志统计</li>
+                <li><code>logManager.searchLogs("keyword")</code> - 搜索日志</li>
+                <li><code>logManager.getLogsByLevel(LogLevel.ERROR)</code> - 按级别过滤</li>
+                <li><code>logManager.clearLogs()</code> - 清空日志</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // LogManager代码（简化版，直接嵌入）
+        var LogLevel = {
+            LOG: "LOG",
+            WARN: "WARN",
+            ERROR: "ERROR",
+            INFO: "INFO"
+        };
+
+        class LogManager {
+            constructor() {
+                this.logs = [];
+                this.maxLogs = 5000;
+                this.originalConsole = {
+                    log: console.log,
+                    warn: console.warn,
+                    error: console.error,
+                    info: console.info
+                };
+                this.interceptConsoleLogs();
+            }
+
+            static getInstance() {
+                if (!LogManager.instance) {
+                    LogManager.instance = new LogManager();
+                }
+                return LogManager.instance;
+            }
+
+            interceptConsoleLogs() {
+                const self = this;
+
+                console.log = function(...args) {
+                    self.addLog(LogLevel.LOG, args);
+                    self.originalConsole.log.apply(console, args);
+                };
+
+                console.warn = function(...args) {
+                    self.addLog(LogLevel.WARN, args);
+                    self.originalConsole.warn.apply(console, args);
+                };
+
+                console.error = function(...args) {
+                    self.addLog(LogLevel.ERROR, args);
+                    self.originalConsole.error.apply(console, args);
+                };
+
+                console.info = function(...args) {
+                    self.addLog(LogLevel.INFO, args);
+                    self.originalConsole.info.apply(console, args);
+                };
+
+                this.originalConsole.log.call(console, "[LogManager] Console log interception initialized");
+            }
+
+            addLog(level, args) {
+                const timestamp = this.getTimestamp();
+                const message = this.formatMessage(args);
+
+                const logEntry = {
+                    timestamp,
+                    level,
+                    message
+                };
+
+                this.logs.push(logEntry);
+
+                if (this.logs.length > this.maxLogs) {
+                    this.logs.shift();
+                }
+            }
+
+            formatMessage(args) {
+                return args.map(arg => {
+                    if (typeof arg === 'object') {
+                        try {
+                            return JSON.stringify(arg, null, 2);
+                        } catch (e) {
+                            return String(arg);
+                        }
+                    }
+                    return String(arg);
+                }).join(' ');
+            }
+
+            getTimestamp() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
+
+                return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
+            }
+
+            getAllLogs() {
+                return [...this.logs];
+            }
+
+            clearLogs() {
+                this.logs = [];
+                console.log("[LogManager] All logs cleared");
+            }
+
+            getLogCount() {
+                return this.logs.length;
+            }
+
+            exportLogsAsText() {
+                let text = `=== Game Logs Export ===\n`;
+                text += `Export Time: ${this.getTimestamp()}\n`;
+                text += `Total Logs: ${this.logs.length}\n`;
+                text += `${"=".repeat(80)}\n\n`;
+
+                this.logs.forEach((log, index) => {
+                    text += `[${index + 1}] [${log.timestamp}] [${log.level}]\n`;
+                    text += `${log.message}\n`;
+                    text += `${"-".repeat(80)}\n`;
+                });
+
+                return text;
+            }
+
+            exportLogsAsJSON() {
+                const exportData = {
+                    exportTime: this.getTimestamp(),
+                    totalLogs: this.logs.length,
+                    logs: this.logs
+                };
+
+                return JSON.stringify(exportData, null, 2);
+            }
+
+            downloadLogsAsText() {
+                const content = this.exportLogsAsText();
+                const filename = `game-logs-${this.getFilenameTimestamp()}.txt`;
+                this.downloadFile(content, filename, 'text/plain');
+                console.log(`[LogManager] Logs downloaded as text: ${filename}`);
+            }
+
+            downloadLogsAsJSON() {
+                const content = this.exportLogsAsJSON();
+                const filename = `game-logs-${this.getFilenameTimestamp()}.json`;
+                this.downloadFile(content, filename, 'application/json');
+                console.log(`[LogManager] Logs downloaded as JSON: ${filename}`);
+            }
+
+            getFilenameTimestamp() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+
+                return `${year}${month}${day}-${hours}${minutes}${seconds}`;
+            }
+
+            downloadFile(content, filename, mimeType) {
+                const blob = new Blob([content], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+
+                document.body.appendChild(link);
+                link.click();
+
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                }, 100);
+            }
+
+            getLogsByLevel(level) {
+                return this.logs.filter(log => log.level === level);
+            }
+
+            searchLogs(keyword) {
+                const lowerKeyword = keyword.toLowerCase();
+                return this.logs.filter(log =>
+                    log.message.toLowerCase().includes(lowerKeyword)
+                );
+            }
+
+            getRecentLogs(count) {
+                return this.logs.slice(-count);
+            }
+
+            getLogStats() {
+                return {
+                    total: this.logs.length,
+                    logCount: this.getLogsByLevel(LogLevel.LOG).length,
+                    warnCount: this.getLogsByLevel(LogLevel.WARN).length,
+                    errorCount: this.getLogsByLevel(LogLevel.ERROR).length,
+                    infoCount: this.getLogsByLevel(LogLevel.INFO).length
+                };
+            }
+
+            printLogStats() {
+                const stats = this.getLogStats();
+                console.log("=== Log Statistics ===");
+                console.log(`Total: ${stats.total}`);
+                console.log(`LOG: ${stats.logCount}`);
+                console.log(`WARN: ${stats.warnCount}`);
+                console.log(`ERROR: ${stats.errorCount}`);
+                console.log(`INFO: ${stats.infoCount}`);
+                console.log("=====================");
+            }
+        }
+
+        // 初始化日志管理器
+        const logManager = LogManager.getInstance();
+        window.logManager = logManager;
+
+        // 设置按钮事件
+        document.getElementById('download-txt-btn').addEventListener('click', () => {
+            logManager.downloadLogsAsText();
+        });
+
+        document.getElementById('download-json-btn').addEventListener('click', () => {
+            logManager.downloadLogsAsJSON();
+        });
+
+        document.getElementById('clear-logs-btn').addEventListener('click', () => {
+            logManager.clearLogs();
+            updateLogCount();
+        });
+
+        document.getElementById('log-stats-btn').addEventListener('click', () => {
+            logManager.printLogStats();
+        });
+
+        // 更新日志计数
+        function updateLogCount() {
+            const count = logManager.getLogCount();
+            document.getElementById('log-count').textContent = `Logs: ${count}`;
+        }
+
+        // 定期更新日志计数
+        setInterval(updateLogCount, 1000);
+
+        // 测试函数
+        function generateNormalLogs() {
+            for (let i = 0; i < 10; i++) {
+                console.log(`[Test] Normal log message ${i + 1}`);
+            }
+            console.log("✓ 已生成10条普通日志");
+        }
+
+        function generateInfoLogs() {
+            for (let i = 0; i < 10; i++) {
+                console.info(`[Test] Info message ${i + 1}: System is running normally`);
+            }
+            console.log("✓ 已生成10条信息日志");
+        }
+
+        function generateWarningLogs() {
+            for (let i = 0; i < 10; i++) {
+                console.warn(`[Test] Warning ${i + 1}: Resource usage is high`);
+            }
+            console.log("✓ 已生成10条警告日志");
+        }
+
+        function generateErrorLogs() {
+            for (let i = 0; i < 10; i++) {
+                console.error(`[Test] Error ${i + 1}: Something went wrong`);
+            }
+            console.log("✓ 已生成10条错误日志");
+        }
+
+        function generateMixedLogs() {
+            console.log("[Test] Starting mixed log generation...");
+            console.info("[Test] System initialized");
+            console.warn("[Test] Memory usage: 75%");
+            console.error("[Test] Failed to load resource");
+            console.log("[Test] Processing item 1");
+            console.log("[Test] Processing item 2");
+            console.warn("[Test] Connection unstable");
+            console.error("[Test] Network timeout");
+            console.info("[Test] Attempting reconnection");
+            console.log("[Test] Reconnection successful");
+            console.log("✓ 已生成10条混合日志");
+        }
+
+        function showStats() {
+            logManager.printLogStats();
+        }
+
+        function showStatsInPage() {
+            const stats = logManager.getLogStats();
+            const statsDiv = document.getElementById('log-stats');
+            statsDiv.innerHTML = `
+                <h3>📊 日志统计</h3>
+                <div class="stat-item">
+                    <span class="stat-label">总计:</span>
+                    <span class="stat-value">${stats.total}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">LOG:</span>
+                    <span class="stat-value">${stats.logCount}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">INFO:</span>
+                    <span class="stat-value">${stats.infoCount}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">WARN:</span>
+                    <span class="stat-value">${stats.warnCount}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">ERROR:</span>
+                    <span class="stat-value">${stats.errorCount}</span>
+                </div>
+            `;
+        }
+
+        function downloadTxt() {
+            logManager.downloadLogsAsText();
+        }
+
+        function downloadJson() {
+            logManager.downloadLogsAsJSON();
+        }
+
+        function searchLogs() {
+            const results = logManager.searchLogs("test");
+            console.log(`搜索结果: 找到 ${results.length} 条包含 "test" 的日志`);
+            console.table(results);
+        }
+
+        function filterErrorLogs() {
+            const errors = logManager.getLogsByLevel(LogLevel.ERROR);
+            console.log(`错误日志: 共 ${errors.length} 条`);
+            console.table(errors);
+        }
+
+        function getRecentLogs() {
+            const recent = logManager.getRecentLogs(10);
+            console.log("最近10条日志:");
+            console.table(recent);
+        }
+
+        // 初始日志
+        console.log("=== 日志系统已初始化 ===");
+        console.log("欢迎使用浏览器日志下载功能测试页面");
+        console.log("请点击页面上的按钮生成测试日志");
+        console.log("========================");
+    </script>
+</body>
+</html>
