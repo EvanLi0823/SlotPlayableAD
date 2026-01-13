@@ -13,8 +13,19 @@ import WinPopupController from "./WinPopupController";
 import DownloadPopupController from "./DownloadPopupController";
 import CashFlyAnimController from "./CashFlyAnimController";
 import LogManager from "./LogManager";
+import { i18n } from "./LocalizationManager";
+import { LanguageCode } from "./LocalizationTypes";
 
 const { ccclass, property } = cc._decorator;
+
+/**
+ * 广告平台类型枚举
+ */
+export enum PlayableAdType {
+   AppLovin = "AppLovin",
+   Mtg = "Mtg",
+   UnityAD = "UnityAD",
+}
 
 @ccclass
 export default class GameScene extends cc.Component {
@@ -50,13 +61,29 @@ export default class GameScene extends cc.Component {
     private spinCount: number = 0;
     private currentResult: SpinResult | null = null;
     private logManager: LogManager = null;
+    private currentAdType: PlayableAdType = PlayableAdType.AppLovin; // 当前广告平台
 
     onLoad() {
         // 初始化日志管理器（必须在所有日志之前）
         this.initLogManager();
 
+        // 设置广告平台类型
+        this.setAdType(PlayableAdType.UnityAD);
+
+        // 初始化本地化管理器
+        // i18n.initialize(LanguageCode.PT);
+        // i18n.initialize(LanguageCode.RU);
+        // i18n.initialize(LanguageCode.ID);
+        // i18n.initialize(LanguageCode.ES);
+        // i18n.initialize(LanguageCode.FR);
+        // i18n.initialize(LanguageCode.EN);
+        i18n.initialize(LanguageCode.DE);
+
+
         cc.log("[GameScene] ========================================");
         cc.log("[GameScene] Initializing game scene...");
+        cc.log(`[GameScene] Current Ad Platform: ${this.currentAdType}`);
+        cc.log(`[GameScene] Current Language: ${i18n.getCurrentLanguage()}`);
         cc.log("[GameScene] Checking component references:");
         cc.log(`[GameScene]   slotMachine: ${this.slotMachine ? 'exists' : 'NULL'}`);
         cc.log(`[GameScene]   topBar: ${this.topBar ? 'exists' : 'NULL'}`);
@@ -73,11 +100,11 @@ export default class GameScene extends cc.Component {
         // 设置UI回调
         this.setupUICallbacks();
 
-        // 播放闲置动画
-        this.playIdleAnimations();
-
         // 设置日志下载按钮
-        this.setupLogDownloadButtons();
+        // this.setupLogDownloadButtons();
+
+        // 检测Mtg平台并调用gameReady
+        this.checkMtgGameReady();
 
         cc.log("[GameScene] Game scene initialized successfully");
         cc.log("[GameScene] ========================================");
@@ -93,6 +120,31 @@ export default class GameScene extends cc.Component {
         // 暴露到window对象，方便浏览器控制台调试
         (window as any).logManager = this.logManager;
         console.log("[GameScene] LogManager exposed to window.logManager");
+    }
+
+    /**
+     * 获取当前广告平台类型
+     */
+    public getCurrentAdType(): PlayableAdType {
+        return this.currentAdType;
+    }
+
+    /**
+     * 设置广告平台类型
+     */
+    public setAdType(adType: PlayableAdType): void {
+        this.currentAdType = adType;
+        cc.log(`[GameScene] Ad platform set to: ${this.currentAdType}`);
+    }
+
+    /**
+     * 检测Mtg平台并调用gameReady
+     */
+    private checkMtgGameReady(): void {
+        if (this.currentAdType === PlayableAdType.Mtg) {
+            cc.log('[GameScene] Mtg platform detected, calling gameReady');
+            (window as any).gameReady && (window as any).gameReady();
+        }
     }
 
     /**
@@ -290,16 +342,16 @@ export default class GameScene extends cc.Component {
      */
     private generateMultipleH01WinLines(): SpinResult {
         const finalLayout: SymbolLayout = [
-            [6, 6, 6, 6, 6],   // Row 0: 全是H01
-            [6, 6, 6, 7, 8],   // Row 1: 前3个H01
-            [7, 8, 9, 9, 10]   // Row 2: 无H01
+            [6, 4, 2, 6, 6],   // Row 0: 全是H01
+            [7, 6, 6, 7, 8],   // Row 1: 前3个H01
+            [7, 8, 9, 6, 10]   // Row 2: 无H01
         ];
 
         // winPositions 会在 SlotMachine.onAllReelsStopped() 中自动从 winLines 提取
         return {
             finalLayout,
             winPositions: [],
-            winAmount: 500  // 假设奖金
+            winAmount: 300  // 假设奖金
         };
     }
 
@@ -478,17 +530,34 @@ export default class GameScene extends cc.Component {
      */
     private jumpToStore(): void {
         cc.log("[GameScene] Jumping to app store...");
+        cc.log(`[GameScene] Current ad platform: ${this.currentAdType}`);
 
-        // 根据平台跳转
-        if (cc.sys.os === cc.sys.OS_IOS) {
-            const appStoreUrl = "https://apps.apple.com/app/id123456789";
-            cc.sys.openURL(appStoreUrl);
-        } else if (cc.sys.os === cc.sys.OS_ANDROID) {
-            const playStoreUrl = "https://play.google.com/store/apps/details?id=com.example.app";
-            cc.sys.openURL(playStoreUrl);
-        } else {
-            cc.log("[GameScene] Platform not supported for app store jump");
+        // 根据广告平台调用对应的方法
+        if (this.currentAdType === PlayableAdType.UnityAD) {
+            cc.log('[GameScene] UnityAD: calling window.openStore');
+            (window as any).openStore && (window as any).openStore();
         }
+        // mtg打开下方这行
+        else if (this.currentAdType === PlayableAdType.Mtg) {
+            cc.log('[GameScene] Mtg: calling window.install');
+            (window as any).install && (window as any).install();
+        }
+        else if (this.currentAdType === PlayableAdType.AppLovin) {
+            // applovin打开下方这行
+            cc.log('[GameScene] AppLovin: calling window.mraid.open');
+            (window as any).mraid && (window as any).mraid.open('https://play.google.com/store/apps/details?id=com.crazy.roil.jackpot.oqed.slots');
+        }
+        // else {
+        //     cc.warn('[GameScene] Unknown ad platform, using fallback method');
+        //     // 降级方案：使用Cocos的openURL
+        //     if (cc.sys.os === cc.sys.OS_IOS) {
+        //         const appStoreUrl = "https://apps.apple.com/app/id123456789";
+        //         cc.sys.openURL(appStoreUrl);
+        //     } else if (cc.sys.os === cc.sys.OS_ANDROID) {
+        //         const playStoreUrl = "https://play.google.com/store/apps/details?id=com.example.app";
+        //         cc.sys.openURL(playStoreUrl);
+        //     }
+        // }
     }
 
     /**
@@ -497,36 +566,7 @@ export default class GameScene extends cc.Component {
     private handleStateChange(state: SlotState): void {
         cc.log(`[GameScene] Slot state changed: ${state}`);
 
-        // 根据状态更新UI
-        switch (state) {
-            case SlotState.SPINNING:
-                // 停止闲置动画
-                this.stopIdleAnimations();
-                break;
-
-            case SlotState.IDLE:
-                // 恢复闲置动画
-                this.playIdleAnimations();
-                break;
-        }
-    }
-
-    /**
-     * 播放闲置动画
-     */
-    private playIdleAnimations(): void {
-        if (this.spinButton) {
-            this.spinButton.playIdleAnimation();
-        }
-    }
-
-    /**
-     * 停止闲置动画
-     */
-    private stopIdleAnimations(): void {
-        if (this.spinButton) {
-            this.spinButton.stopIdleAnimation();
-        }
+        // 根据状态更新UI（如果需要的话）
     }
 
     /**

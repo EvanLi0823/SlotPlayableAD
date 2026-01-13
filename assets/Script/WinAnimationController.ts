@@ -13,7 +13,7 @@ const { ccclass } = cc._decorator;
 export default class WinAnimationController {
     private gridManager: GridManager = null;
     private animConfigs: Map<number, SymbolAnimConfig> = new Map();
-    private loopCount: number = 3;
+    private loopCount: number = 0;  // 由 init() 方法设置
 
     /**
      * 初始化

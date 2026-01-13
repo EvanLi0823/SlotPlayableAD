@@ -68,7 +68,7 @@ export default class SlotConfig extends cc.Component {
     readonly bounceBackDistance: number = 0;        // 去掉回弹
     readonly bounceBackDuration: number = 0;        // 去掉回弹
     readonly winAnimationDelay: number = 0.3;
-    readonly winAnimationLoops: number = 3;
+    readonly winAnimationLoops: number = 2;
 
     // ========== 弹窗配置 ==========
     @property({ tooltip: "现金飞行动画时长（秒）" })

@@ -4,6 +4,9 @@
  */
 
 import { currency } from './CurrencyConverter';
+import GameScene, { PlayableAdType } from './GameScene';
+import { i18n } from './LocalizationManager';
+import MoneyFountainController from './MoneyFountainController';
 
 const { ccclass, property } = cc._decorator;
 
@@ -18,11 +21,17 @@ export default class WinPopupController extends cc.Component {
     @property(cc.Button)
     claimButton: cc.Button = null;
 
+    @property(cc.Label)
+    claimButtonLabel: cc.Label = null;
+
     @property(cc.Node)
     maskNode: cc.Node = null;
 
     @property(cc.Node)
     contentNode: cc.Node = null;
+
+     @property(cc.Node)
+    rewardAniNode: cc.Node = null;
 
     // 回调
     public onClaimClicked: (() => void) | null = null;
@@ -32,6 +41,7 @@ export default class WinPopupController extends cc.Component {
     private currentAmount: number = 0;
     private isInitialized: boolean = false;
     private originalContentScale: number = 1.0;  // 保存contentNode的原始scale
+    private moneyFountain: MoneyFountainController = null;  // 飞钱动画控制器
 
     onLoad() {
         cc.log("[WinPopupController] ========================================");
@@ -43,10 +53,46 @@ export default class WinPopupController extends cc.Component {
         cc.log(`[WinPopupController] amountLabel: ${this.amountLabel ? 'exists' : 'NULL'}`);
         cc.log(`[WinPopupController] claimButton: ${this.claimButton ? 'exists' : 'NULL'}`);
 
+        // 获取飞钱动画控制器
+        if (this.rewardAniNode) {
+            this.moneyFountain = this.rewardAniNode.getComponent(MoneyFountainController);
+            if (this.moneyFountain) {
+                cc.log("[WinPopupController] MoneyFountainController found");
+            } else {
+                cc.warn("[WinPopupController] MoneyFountainController not found on rewardAniNode");
+            }
+        } else {
+            cc.warn("[WinPopupController] rewardAniNode not set");
+        }
+
         this.initializePopup();
 
         cc.log("[WinPopupController] onLoad completed");
         cc.log("[WinPopupController] ========================================");
+    }
+
+    start() {
+        // 在start中更新按钮文本，确保i18n已经初始化
+        this.updateClaimButtonText();
+    }
+
+    /**
+     * 更新领取按钮文本
+     */
+    private updateClaimButtonText(): void {
+        if (this.claimButtonLabel) {
+            const cashoutText = i18n.getText('cashout');
+            this.claimButtonLabel.string = cashoutText;
+            cc.log(`[WinPopupController] Updated claim button label to: ${cashoutText}`);
+        } else if (this.claimButton) {
+            // 如果没有设置claimButtonLabel，尝试从按钮子节点获取Label组件
+            const label = this.claimButton.node.getComponentInChildren(cc.Label);
+            if (label) {
+                const cashoutText = i18n.getText('cashout');
+                label.string = cashoutText;
+                cc.log(`[WinPopupController] Updated claim button label (from child) to: ${cashoutText}`);
+            }
+        }
     }
 
     /**
@@ -130,10 +176,13 @@ export default class WinPopupController extends cc.Component {
         this.isShowing = true;
         this.currentAmount = winAmount;
 
-        // 更新金额文本（使用货币转换和格式化）
+        // 更新金额文本（使用货币转换和格式化，去掉小数点和千位分隔符）
         if (this.amountLabel) {
-            // 假设winAmount是USD金额，转换为当前语言的货币并格式化
-            const formattedAmount = currency.convertAndFormat(winAmount);
+            // 假设winAmount是USD金额，转换为当前语言的货币并格式化（0位小数，无千位分隔符）
+            const formattedAmount = currency.convertAndFormat(winAmount, {
+                decimals: 0,
+                thousandsSeparator: ''
+            });
             this.amountLabel.string = formattedAmount;
             cc.log(`[WinPopupController] Updated amount label to: ${formattedAmount}`);
         } else {
@@ -152,10 +201,20 @@ export default class WinPopupController extends cc.Component {
             cc.error(`[WinPopupController] popupNode is NULL! Cannot show popup.`);
         }
 
+        // 启动飞钱动画（在弹窗弹出动画开始时就启动）
+        if (this.moneyFountain) {
+            cc.log(`[WinPopupController] Starting money fountain animation (before popup animation)`);
+            this.moneyFountain.play();
+        }
+
         // 播放弹出动画
         cc.log(`[WinPopupController] Starting show animation...`);
         await this.playShowAnimation();
         cc.log(`[WinPopupController] Show animation completed`);
+
+        // 检测Mtg平台并调用gameEnd
+        this.checkMtgPlatform();
+
         cc.log(`[WinPopupController] ========================================`);
     }
 
@@ -167,6 +226,12 @@ export default class WinPopupController extends cc.Component {
 
         cc.log("[WinPopupController] Hiding popup");
 
+        // 停止飞钱动画
+        if (this.moneyFountain) {
+            cc.log("[WinPopupController] Stopping money fountain animation");
+            this.moneyFountain.stop();
+        }
+
         // 播放隐藏动画
         await this.playHideAnimation();
 
@@ -176,6 +241,30 @@ export default class WinPopupController extends cc.Component {
         }
 
         this.isShowing = false;
+    }
+
+    /**
+     * 检测Mtg平台并调用gameEnd
+     */
+    private checkMtgPlatform(): void {
+        try {
+            // 获取GameScene实例
+            const gameScene = cc.director.getScene().getComponentInChildren(GameScene);
+
+            if (gameScene) {
+                const adType = gameScene.getCurrentAdType();
+                cc.log(`[WinPopupController] Current ad platform: ${adType}`);
+
+                // mtg打开下面这行
+                if (adType === PlayableAdType.Mtg) {
+                    (window as any).gameEnd && (window as any).gameEnd();
+                }
+            } else {
+                cc.warn('[WinPopupController] GameScene not found');
+            }
+        } catch (e) {
+            cc.error('[WinPopupController] Error checking Mtg platform:', e);
+        }
     }
 
     /**

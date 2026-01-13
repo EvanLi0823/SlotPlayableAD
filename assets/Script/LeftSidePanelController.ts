@@ -3,6 +3,8 @@
  * 管理左侧Icon和Download按钮
  */
 
+import { i18n } from './LocalizationManager';
+
 const { ccclass, property } = cc._decorator;
 
 @ccclass
@@ -12,6 +14,9 @@ export default class LeftSidePanelController extends cc.Component {
 
     @property(cc.Button)
     downloadButton: cc.Button = null;
+
+    @property(cc.Label)
+    downloadLabel: cc.Label = null;
 
     @property(cc.Sprite)
     iconSprite: cc.Sprite = null;
@@ -30,6 +35,30 @@ export default class LeftSidePanelController extends cc.Component {
 
         // 播放Icon的闲置动画
         this.playIconIdleAnimation();
+    }
+
+    start() {
+        // 在start中更新文本，确保i18n已经初始化
+        this.updateDownloadButtonText();
+    }
+
+    /**
+     * 更新下载按钮文本
+     */
+    private updateDownloadButtonText(): void {
+        if (this.downloadLabel) {
+            const downloadText = i18n.getText('download');
+            this.downloadLabel.string = downloadText;
+            cc.log(`[LeftSidePanelController] Updated download label to: ${downloadText}`);
+        } else if (this.downloadButton) {
+            // 如果没有设置downloadLabel，尝试从按钮子节点获取Label组件
+            const label = this.downloadButton.node.getComponentInChildren(cc.Label);
+            if (label) {
+                const downloadText = i18n.getText('download');
+                label.string = downloadText;
+                cc.log(`[LeftSidePanelController] Updated download label (from child) to: ${downloadText}`);
+            }
+        }
     }
 
     /**

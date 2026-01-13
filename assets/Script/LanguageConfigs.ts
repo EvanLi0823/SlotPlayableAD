@@ -20,6 +20,7 @@ export const LANGUAGE_CONFIGS: { [key: string]: ILanguageData } = {
             },
             download: 'Download',
             tipLbl: 'The final result is not guaranteed, the amount you can obtain is subject to the rules published in the APP or web page.',
+            cashout: 'Cash out',
         }
     },
 
@@ -37,6 +38,7 @@ export const LANGUAGE_CONFIGS: { [key: string]: ILanguageData } = {
             },
             download: 'Unduh',
             tipLbl: 'Hasil akhir tidak dijamin, jumlah yang dapat Anda peroleh tunduk pada aturan yang dipublikasikan di APP atau halaman web.',
+            cashout: 'Uang tunai',
         }
     },
 
@@ -54,6 +56,7 @@ export const LANGUAGE_CONFIGS: { [key: string]: ILanguageData } = {
             },
             download: 'Скачать',
             tipLbl: 'Окончательный результат не гарантируется, сумма, которую вы можете получить, зависит от правил, опубликованных в приложении или на веб-странице.',
+            cashout: 'Вывести деньги',
         }
     },
 
@@ -71,6 +74,7 @@ export const LANGUAGE_CONFIGS: { [key: string]: ILanguageData } = {
             },
             download: 'Descargar',
             tipLbl: 'El resultado final no está garantizado, la cantidad que puedes obtener está sujeta a las reglas publicadas en la APP o página web.',
+            cashout: 'Retirar',
         }
     },
 
@@ -88,6 +92,7 @@ export const LANGUAGE_CONFIGS: { [key: string]: ILanguageData } = {
             },
             download: 'Herunterladen',
             tipLbl: 'Das Endergebnis ist nicht garantiert, der Betrag, den Sie erhalten können, unterliegt den in der APP oder Webseite veröffentlichten Regeln.',
+            cashout: 'Auszahlen',
         }
     },
 
@@ -105,6 +110,7 @@ export const LANGUAGE_CONFIGS: { [key: string]: ILanguageData } = {
             },
             download: 'Télécharger',
             tipLbl: 'Le résultat final n\'est pas garanti, le montant que vous pouvez obtenir est soumis aux règles publiées dans l\'APP ou la page web.',
+            cashout: 'Retirer',
         }
     },
 
@@ -122,6 +128,7 @@ export const LANGUAGE_CONFIGS: { [key: string]: ILanguageData } = {
             },
             download: 'Baixar',
             tipLbl: 'O resultado final não é garantido, o valor que você pode obter está sujeito às regras publicadas no APP ou página da web.',
+            cashout: 'Sacar',
         }
     }
 };

@@ -13,23 +13,36 @@ export default class SpinButtonController extends cc.Component {
     @property(cc.Node)
     buttonNode: cc.Node = null;
 
-    @property(cc.Label)
-    buttonLabel: cc.Label = null;
+    @property(cc.Node)
+    guideHandNode: cc.Node = null;
 
     // 回调
     public onSpinClicked: (() => void) | null = null;
 
     // 状态
     private isSpinning: boolean = false;
+    private isFirstTime: boolean = true;  // 是否第一次进入游戏
 
     onLoad() {
         if (!this.buttonNode && this.spinButton) {
             this.buttonNode = this.spinButton.node;
         }
 
+        // 初始隐藏小手引导
+        if (this.guideHandNode) {
+            this.guideHandNode.active = false;
+        }
+
         // 监听点击事件
         if (this.spinButton) {
             this.spinButton.node.on("click", this.handleSpinClick, this);
+        }
+    }
+
+    start() {
+        // 游戏启动后显示小手引导
+        if (this.isFirstTime) {
+            this.showGuideHand();
         }
     }
 
@@ -44,8 +57,11 @@ export default class SpinButtonController extends cc.Component {
 
         cc.log("[SpinButtonController] Spin button clicked");
 
-        // 播放点击动画
-        this.playClickAnimation();
+        // 首次点击时隐藏小手引导
+        if (this.isFirstTime) {
+            this.hideGuideHand();
+            this.isFirstTime = false;
+        }
 
         // 触发回调
         if (this.onSpinClicked) {
@@ -67,48 +83,63 @@ export default class SpinButtonController extends cc.Component {
         if (this.buttonNode) {
             this.buttonNode.opacity = enabled ? 255 : 150;
         }
+    }
 
-        // 更新文本
-        if (this.buttonLabel) {
-            this.buttonLabel.string = enabled ? "SPIN" : "SPINNING...";
+    /**
+     * 显示小手引导
+     */
+    showGuideHand(): void {
+        if (!this.guideHandNode) {
+            cc.warn("[SpinButtonController] guideHandNode is not set");
+            return;
         }
+
+        cc.log("[SpinButtonController] Showing guide hand");
+
+        // 显示节点
+        this.guideHandNode.active = true;
+        this.guideHandNode.opacity = 255;
+        this.guideHandNode.scale = 1.0;
+
+        // 播放放大缩小动画
+        this.playGuideHandAnimation();
     }
 
     /**
-     * 播放按钮点击动画
+     * 隐藏小手引导
      */
-    private playClickAnimation(): void {
-        if (!this.buttonNode) return;
+    hideGuideHand(): void {
+        if (!this.guideHandNode) return;
 
-        cc.tween(this.buttonNode)
-            .to(0.05, { scale: 0.95 })
-            .to(0.1, { scale: 1.05 })
-            .to(0.05, { scale: 1.0 })
-            .start();
+        cc.log("[SpinButtonController] Hiding guide hand");
+
+        // 停止动画
+        cc.Tween.stopAllByTarget(this.guideHandNode);
+
+        // 直接隐藏（无淡出动画）
+        this.guideHandNode.active = false;
     }
 
     /**
-     * 播放按钮呼吸动画（闲置时）
+     * 播放小手引导动画（放大缩小循环）
      */
-    playIdleAnimation(): void {
-        if (!this.buttonNode || this.isSpinning) return;
+    private playGuideHandAnimation(): void {
+        if (!this.guideHandNode) return;
 
-        cc.tween(this.buttonNode)
-            .to(0.8, { scale: 1.05 })
-            .to(0.8, { scale: 1.0 })
+        cc.tween(this.guideHandNode)
+            .to(0.6, { scale: 1.5 }, { easing: "sineInOut" })
+            .to(0.6, { scale: 1.0 }, { easing: "sineInOut" })
             .union()
             .repeatForever()
             .start();
     }
 
     /**
-     * 停止呼吸动画
+     * 手动触发小手引导显示（可选，用于调试或重置）
      */
-    stopIdleAnimation(): void {
-        if (!this.buttonNode) return;
-
-        cc.Tween.stopAllByTarget(this.buttonNode);
-        this.buttonNode.scale = 1.0;
+    resetGuideHand(): void {
+        this.isFirstTime = true;
+        this.showGuideHand();
     }
 
     onDestroy() {
@@ -116,6 +147,9 @@ export default class SpinButtonController extends cc.Component {
             this.spinButton.node.off("click", this.handleSpinClick, this);
         }
 
-        this.stopIdleAnimation();
+        // 停止小手动画
+        if (this.guideHandNode) {
+            cc.Tween.stopAllByTarget(this.guideHandNode);
+        }
     }
 }

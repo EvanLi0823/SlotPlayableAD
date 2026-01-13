@@ -41,6 +41,7 @@ export interface ILanguageTexts {
     guide: ITextConfig;
     download: string;
     tipLbl: string;
+    cashout: string;
 }
 
 /**

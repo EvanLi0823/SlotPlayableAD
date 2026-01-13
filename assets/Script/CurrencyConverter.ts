@@ -124,13 +124,25 @@ export class CurrencyConverter {
         const roundedAmount = Math.round(amount * Math.pow(10, decimals)) / Math.pow(10, decimals);
 
         // 分离整数和小数部分
-        const parts = roundedAmount.toFixed(decimals).split('.');
-        const integerPart = parts[0];
-        const decimalPart = parts[1];
+        let integerPart: string;
+        let decimalPart: string;
+
+        if (decimals === 0) {
+            // 如果小数位为0，直接取整数部分
+            integerPart = Math.round(roundedAmount).toString();
+            decimalPart = '';
+        } else {
+            const parts = roundedAmount.toFixed(decimals).split('.');
+            integerPart = parts[0];
+            decimalPart = parts[1] || '';
+        }
 
         // 添加千位分隔符
-        const thousandsSeparator = finalOptions.thousandsSeparator || ',';
-        const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSeparator);
+        const thousandsSeparator = finalOptions.thousandsSeparator !== undefined ? finalOptions.thousandsSeparator : ',';
+        let formattedInteger = integerPart;
+        if (thousandsSeparator !== '') {
+            formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSeparator);
+        }
 
         // 组合整数和小数部分
         const decimalSeparator = finalOptions.decimalSeparator || '.';

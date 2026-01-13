@@ -13,8 +13,8 @@ const { ccclass } = cc._decorator;
 export default class GridManager {
     private reelControllers: ReelController[] = [];
     private currentLayout: SymbolLayout = [];
-    private rows: number = 3;
-    private reels: number = 5;
+    private rows: number = 0;  // 由 init() 方法设置
+    private reels: number = 0;  // 由 init() 方法设置
 
     /**
      * 初始化

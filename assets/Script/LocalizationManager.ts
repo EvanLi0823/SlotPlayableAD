@@ -71,7 +71,7 @@ export class LocalizationManager {
     /**
      * 获取指定的文本
      */
-    public getText(key: 'download' | 'tipLbl'): string {
+    public getText(key: 'download' | 'tipLbl' | 'cashout'): string {
         return this.currentLanguageData.texts[key];
     }
 
