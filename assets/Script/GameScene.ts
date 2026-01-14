@@ -554,7 +554,7 @@ export default class GameScene extends cc.Component {
         //         const appStoreUrl = "https://apps.apple.com/app/id123456789";
         //         cc.sys.openURL(appStoreUrl);
         //     } else if (cc.sys.os === cc.sys.OS_ANDROID) {
-        //         const playStoreUrl = "https://play.google.com/store/apps/details?id=com.example.app";
+        //         const playStoreUrl = "https://play.google.com/store/apps/details?id=com.crazy.roil.jackpot.oqed.slots";
         //         cc.sys.openURL(playStoreUrl);
         //     }
         // }

@@ -141,7 +141,7 @@ export default class SlotConfig extends cc.Component {
     iosStoreURL: string = "https://apps.apple.com/app/id123456789";
 
     @property({ tooltip: "Google Play Store URL" })
-    androidStoreURL: string = "https://play.google.com/store/apps/details?id=com.example.app";
+    androidStoreURL: string = "https://play.google.com/store/apps/details?id=com.crazy.roil.jackpot.oqed.slots";
 
     /**
      * 获取当前平台的应用商店URL

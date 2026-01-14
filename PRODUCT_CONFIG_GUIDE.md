@@ -94,7 +94,7 @@ build/output/AppLovin/
 {
   "platforms": {
     "UnityAD": {
-      "storeUrl": "https://play.google.com/store/apps/details?id=com.winter.slots.snow.scser",
+      "storeUrl": "https://play.google.com/store/apps/details?id=com.crazy.roil.jackpot.oqed.slots",
       "htmlModifications": [
         {
           "description": "在文件末尾添加 UnityAD MRAID 脚本",
@@ -138,7 +138,7 @@ build/output/AppLovin/
       "languages": ["EN", "DE", "FR", "ES", "PT", "RU", "ID"],
       "buildOutputDir": "build",
       "sourceHtmlFile": "build/Unity.html",
-      "storeUrl": "https://play.google.com/store/apps/details?id=com.winter.slots.snow.scser",
+      "storeUrl": "https://play.google.com/store/apps/details?id=com.crazy.roil.jackpot.oqed.slots",
       "codeModifications": {
         "sourceFile": "assets/Script/GameScene.ts",
         "modifications": [
@@ -170,7 +170,7 @@ build/output/AppLovin/
 ```javascript
 function openStore(){
   console.log("openStore")
-  mraid.open("https://play.google.com/store/apps/details?id=com.winter.slots.snow.scser")
+  mraid.open("https://play.google.com/store/apps/details?id=com.crazy.roil.jackpot.oqed.slots")
 }
 ```
 
@@ -265,7 +265,7 @@ grep "mraid.open" build/output/UnityAD/WinterChristmasSlots_Unity_EN.html
 
 预期输出:
 ```
-mraid.open("https://play.google.com/store/apps/details?id=com.winter.slots.snow.scser")
+mraid.open("https://play.google.com/store/apps/details?id=com.crazy.roil.jackpot.oqed.slots")
 ```
 
 ---
