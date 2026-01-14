@@ -16,6 +16,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 // ==================== 配置 ====================
 
@@ -99,7 +100,7 @@ function getPlatformSourceFile(platform) {
     // 根据平台类型返回对应的源文件名
     const platformFileMap = {
         'AppLovin': 'AppLovin.html',
-        'Mtg': 'Mintegral.html',
+        'Mtg': 'AppLovin.html',  // Mtg 使用 AppLovin.html 作为源文件
         'UnityAD': 'Unity.html'
     };
 
@@ -125,6 +126,38 @@ function getOutputFileName(platform, language) {
 function ensureDir(dirPath) {
     if (!fs.existsSync(dirPath)) {
         fs.mkdirSync(dirPath, { recursive: true });
+    }
+}
+
+/**
+ * 压缩文件为 zip
+ */
+function zipFile(filePath, zipPath) {
+    try {
+        logInfo(`开始压缩文件...`);
+
+        const fileName = path.basename(filePath);
+        const fileDir = path.dirname(filePath);
+
+        // 使用系统的 zip 命令
+        // -j 表示不包含目录结构，只压缩文件本身
+        // -q 表示安静模式
+        execSync(`cd "${fileDir}" && zip -jq "${zipPath}" "${fileName}"`, {
+            stdio: 'pipe'
+        });
+
+        // 获取压缩文件大小
+        const stats = fs.statSync(zipPath);
+        const zipSizeKB = (stats.size / 1024).toFixed(2);
+        const zipSizeMB = (stats.size / 1024 / 1024).toFixed(2);
+
+        logSuccess(`压缩完成: ${path.basename(zipPath)}`);
+        logInfo(`压缩文件大小: ${zipSizeKB} KB (${zipSizeMB} MB)`);
+
+        return true;
+    } catch (error) {
+        logError(`压缩失败: ${error.message}`);
+        return false;
     }
 }
 
@@ -241,6 +274,27 @@ function processBuildFile(platform, language) {
     logInfo(`输出文件: ${outputFileName}`);
     logInfo(`文件大小: ${fileSizeKB} KB (${fileSizeMB} MB)`);
     logInfo(`输出路径: ${outputFilePath}`);
+
+    // 8. 检查是否需要压缩
+    const config = JSON.parse(fs.readFileSync(BUILD_CONFIG_FILE, 'utf8'));
+    const platformConfig = config.platforms[platform];
+
+    if (platformConfig && platformConfig.zipOutput === true) {
+        log('==========================================');
+        logInfo('该平台需要压缩输出文件');
+
+        // 生成 zip 文件名（移除 .html 扩展名，添加 .zip）
+        const zipFileName = outputFileName.replace('.html', '.zip');
+        const zipFilePath = path.join(outputPlatformDir, zipFileName);
+
+        // 压缩文件
+        const zipSuccess = zipFile(outputFilePath, zipFilePath);
+
+        if (zipSuccess) {
+            logInfo(`压缩文件路径: ${zipFilePath}`);
+        }
+    }
+
     log('==========================================');
 
     return true;
