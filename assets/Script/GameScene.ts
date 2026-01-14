@@ -545,7 +545,7 @@ export default class GameScene extends cc.Component {
         else if (this.currentAdType === PlayableAdType.AppLovin) {
             // applovin打开下方这行
             cc.log('[GameScene] AppLovin: calling window.mraid.open');
-            (window as any).mraid && (window as any).mraid.open('https://play.google.com/store/apps/details?id=com.spooky.fortune.lpwer.slots');
+            (window as any).mraid && (window as any).mraid.open('https://play.google.com/store/apps/details?id=com.newyear.jackpot.spin.qodfd');
         }
         // else {
         //     cc.warn('[GameScene] Unknown ad platform, using fallback method');
@@ -554,7 +554,7 @@ export default class GameScene extends cc.Component {
         //         const appStoreUrl = "https://apps.apple.com/app/id123456789";
         //         cc.sys.openURL(appStoreUrl);
         //     } else if (cc.sys.os === cc.sys.OS_ANDROID) {
-        //         const playStoreUrl = "https://play.google.com/store/apps/details?id=com.spooky.fortune.lpwer.slots";
+        //         const playStoreUrl = "https://play.google.com/store/apps/details?id=com.newyear.jackpot.spin.qodfd";
         //         cc.sys.openURL(playStoreUrl);
         //     }
         // }
