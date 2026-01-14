@@ -71,8 +71,8 @@ export default class GameScene extends cc.Component {
         this.setAdType(PlayableAdType.UnityAD);
 
         // 初始化本地化管理器
-        i18n.initialize(LanguageCode.RU);
-        // i18n.initialize(LanguageCode.XX);
+        // i18n.initialize(LanguageCode.DE);
+        i18n.initialize(LanguageCode.PT);
         // i18n.initialize(LanguageCode.XX);
         // i18n.initialize(LanguageCode.XX);
         // i18n.initialize(LanguageCode.XX);
@@ -545,7 +545,7 @@ export default class GameScene extends cc.Component {
         else if (this.currentAdType === PlayableAdType.AppLovin) {
             // applovin打开下方这行
             cc.log('[GameScene] AppLovin: calling window.mraid.open');
-            (window as any).mraid && (window as any).mraid.open('https://play.google.com/store/apps/details?id=com.crazy.roil.jackpot.oqed.slots');
+            (window as any).mraid && (window as any).mraid.open('https://play.google.com/store/apps/details?id=com.spooky.fortune.lpwer.slots');
         }
         // else {
         //     cc.warn('[GameScene] Unknown ad platform, using fallback method');
@@ -554,7 +554,7 @@ export default class GameScene extends cc.Component {
         //         const appStoreUrl = "https://apps.apple.com/app/id123456789";
         //         cc.sys.openURL(appStoreUrl);
         //     } else if (cc.sys.os === cc.sys.OS_ANDROID) {
-        //         const playStoreUrl = "https://play.google.com/store/apps/details?id=com.crazy.roil.jackpot.oqed.slots";
+        //         const playStoreUrl = "https://play.google.com/store/apps/details?id=com.spooky.fortune.lpwer.slots";
         //         cc.sys.openURL(playStoreUrl);
         //     }
         // }

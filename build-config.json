@@ -1,5 +1,5 @@
 {
-  "productName": "LuckyMinerTreasureSlots",
+  "productName": "SpookyFortuneSlots",
   "platforms": {
     "AppLovin": {
       "name": "AppLovin",
@@ -77,7 +77,7 @@
       ],
       "buildOutputDir": "build",
       "sourceHtmlFile": "build/Unity.html",
-      "storeUrl": "https://play.google.com/store/apps/details?id=com.crazy.roil.jackpot.oqed.slots",
+      "storeUrl": "https://play.google.com/store/apps/details?id=com.spooky.fortune.lpwer.slots",
       "codeModifications": {
         "sourceFile": "assets/Script/GameScene.ts",
         "modifications": [
