@@ -114,7 +114,7 @@ function getOutputFileName(platform, language) {
     const config = JSON.parse(fs.readFileSync(BUILD_CONFIG_FILE, 'utf8'));
 
     // 获取产品名称前缀
-    const productPrefix = config.productPrefix || 'WinterChristmasSlots';
+    const productPrefix = config.productName || 'WinterChristmasSlots';
 
     return `${productPrefix}_${platform}_${language}.html`;
 }
@@ -126,6 +126,66 @@ function ensureDir(dirPath) {
     if (!fs.existsSync(dirPath)) {
         fs.mkdirSync(dirPath, { recursive: true });
     }
+}
+
+/**
+ * 应用 HTML 修改规则
+ */
+function applyHtmlModifications(htmlContent, platform, language) {
+    const config = JSON.parse(fs.readFileSync(BUILD_CONFIG_FILE, 'utf8'));
+    const platformConfig = config.platforms[platform];
+
+    if (!platformConfig || !platformConfig.htmlModifications || platformConfig.htmlModifications.length === 0) {
+        logInfo('该平台没有配置 HTML 修改规则，跳过修改');
+        return htmlContent;
+    }
+
+    logInfo(`开始应用 HTML 修改规则 (共 ${platformConfig.htmlModifications.length} 条)...`);
+
+    let modifiedContent = htmlContent;
+    let modificationCount = 0;
+
+    for (const modification of platformConfig.htmlModifications) {
+        // 检查是否启用
+        if (modification.enabled === false) {
+            logInfo(`- 跳过 (已禁用): ${modification.description}`);
+            continue;
+        }
+
+        try {
+            // 替换变量
+            let replacement = modification.replacement;
+
+            // 替换 ${STORE_URL} 变量
+            if (platformConfig.storeUrl && replacement.includes('${STORE_URL}')) {
+                replacement = replacement.replace(/\$\{STORE_URL\}/g, platformConfig.storeUrl);
+            }
+
+            // 替换 ${LANGUAGE} 变量
+            if (replacement.includes('${LANGUAGE}')) {
+                replacement = replacement.replace(/\$\{LANGUAGE\}/g, language);
+            }
+
+            // 应用正则替换
+            const regex = new RegExp(modification.pattern, 'g');
+            const beforeLength = modifiedContent.length;
+            modifiedContent = modifiedContent.replace(regex, replacement);
+            const afterLength = modifiedContent.length;
+
+            if (beforeLength !== afterLength) {
+                modificationCount++;
+                logSuccess(`✓ 应用成功: ${modification.description}`);
+            } else {
+                logInfo(`- 未匹配: ${modification.description}`);
+            }
+        } catch (error) {
+            logError(`✗ 应用失败: ${modification.description}`);
+            logError(`  错误: ${error.message}`);
+        }
+    }
+
+    logSuccess(`HTML 修改完成，成功应用 ${modificationCount} 条规则`);
+    return modifiedContent;
 }
 
 /**
@@ -156,11 +216,18 @@ function processBuildFile(platform, language) {
     const outputFileName = getOutputFileName(platform, language);
     const outputFilePath = path.join(outputPlatformDir, outputFileName);
 
-    // 4. 复制文件
-    logInfo(`复制文件到: ${outputFilePath}`);
-    fs.copyFileSync(sourceFilePath, outputFilePath);
+    // 4. 读取源文件内容
+    logInfo('读取源文件内容...');
+    let htmlContent = fs.readFileSync(sourceFilePath, 'utf8');
 
-    // 5. 获取文件大小
+    // 5. 应用 HTML 修改规则
+    htmlContent = applyHtmlModifications(htmlContent, platform, language);
+
+    // 6. 写入输出文件
+    logInfo(`写入文件到: ${outputFilePath}`);
+    fs.writeFileSync(outputFilePath, htmlContent, 'utf8');
+
+    // 7. 获取文件大小
     const stats = fs.statSync(outputFilePath);
     const fileSizeKB = (stats.size / 1024).toFixed(2);
     const fileSizeMB = (stats.size / 1024 / 1024).toFixed(2);
