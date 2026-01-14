@@ -71,13 +71,13 @@ export default class GameScene extends cc.Component {
         this.setAdType(PlayableAdType.UnityAD);
 
         // 初始化本地化管理器
-        // i18n.initialize(LanguageCode.RU);
+        i18n.initialize(LanguageCode.RU);
         // i18n.initialize(LanguageCode.PT);
         // i18n.initialize(LanguageCode.EN);
         // i18n.initialize(LanguageCode.DE);
         // i18n.initialize(LanguageCode.ID);
         // i18n.initialize(LanguageCode.ES);
-        i18n.initialize(LanguageCode.FR);
+        // i18n.initialize(LanguageCode.FR);
 
 
         cc.log("[GameScene] ========================================");
@@ -545,7 +545,7 @@ export default class GameScene extends cc.Component {
         else if (this.currentAdType === PlayableAdType.AppLovin) {
             // applovin打开下方这行
             cc.log('[GameScene] AppLovin: calling window.mraid.open');
-            (window as any).mraid && (window as any).mraid.open('https://play.google.com/store/apps/details?id=com.mafia.king.lzhyer.game');
+            (window as any).mraid && (window as any).mraid.open('https://play.google.com/store/apps/details?id=com.cowboy.crazy.reels.nber');
         }
         // else {
         //     cc.warn('[GameScene] Unknown ad platform, using fallback method');
