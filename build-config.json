@@ -1,0 +1,130 @@
+{
+  "productName": "WinterChristmasSlots",
+  "platforms": {
+    "AppLovin": {
+      "name": "AppLovin",
+      "adType": "PlayableAdType.AppLovin",
+      "languages": [
+        "EN",
+        "PT"
+      ],
+      "buildOutputDir": "build",
+      "sourceHtmlFile": "build/AppLovin.html",
+      "codeModifications": {
+        "sourceFile": "assets/Script/GameScene.ts",
+        "modifications": [
+          {
+            "description": "设置广告平台为 AppLovin",
+            "pattern": "this\\.setAdType\\(PlayableAdType\\.\\w+\\);",
+            "replacement": "this.setAdType(PlayableAdType.AppLovin);"
+          }
+        ]
+      },
+      "htmlModifications": [],
+      "outputFilePattern": "${PRODUCT_NAME}_AppLovin_${LANGUAGE}.html",
+      "zipOutput": false,
+      "zipPattern": "${PRODUCT_NAME}_AppLovin_${LANGUAGE}.zip"
+    },
+    "Mtg": {
+      "name": "Mintegral",
+      "adType": "PlayableAdType.Mtg",
+      "languages": [
+        "EN",
+        "PT"
+      ],
+      "buildOutputDir": "build",
+      "sourceHtmlFile": "build/AppLovin.html",
+      "codeModifications": {
+        "sourceFile": "assets/Script/GameScene.ts",
+        "modifications": [
+          {
+            "description": "设置广告平台为 Mtg",
+            "pattern": "this\\.setAdType\\(PlayableAdType\\.\\w+\\);",
+            "replacement": "this.setAdType(PlayableAdType.Mtg);"
+          }
+        ]
+      },
+      "htmlModifications": [
+        {
+          "description": "删除 splash 样式",
+          "pattern": "#splash \\{[^}]*\\}",
+          "replacement": "",
+          "enabled": true
+        },
+        {
+          "description": "移除 mraid.js 引用",
+          "pattern": "</style><script src=\"mraid\\.js\"></script></head>",
+          "replacement": "</style></head>",
+          "enabled": true
+        },
+        {
+          "description": "在 </div> 后添加 gameStart 和 gameClose 函数",
+          "pattern": "(</div>\\s*</div>)\\s*(<script)",
+          "replacement": "$1\n<script>\n    function gameStart(){}\n    function gameClose(){}\n</script>\n$2",
+          "enabled": true
+        }
+      ],
+      "outputFilePattern": "${PRODUCT_NAME}_Mintegral_${LANGUAGE}.html",
+      "zipOutput": true,
+      "zipPattern": "${PRODUCT_NAME}_Mintegral_${LANGUAGE}.zip"
+    },
+    "UnityAD": {
+      "name": "UnityAD",
+      "adType": "PlayableAdType.UnityAD",
+      "languages": [
+        "EN",
+        "PT"
+      ],
+      "buildOutputDir": "build",
+      "sourceHtmlFile": "build/Unity.html",
+      "storeUrl": "https://play.google.com/store/apps/details?id=com.winter.slots.snow.scser",
+      "codeModifications": {
+        "sourceFile": "assets/Script/GameScene.ts",
+        "modifications": [
+          {
+            "description": "设置广告平台为 UnityAD",
+            "pattern": "this\\.setAdType\\(PlayableAdType\\.\\w+\\);",
+            "replacement": "this.setAdType(PlayableAdType.UnityAD);"
+          }
+        ]
+      },
+      "htmlModifications": [
+        {
+          "description": "在 </div> 后添加 UnityAD MRAID 脚本",
+          "pattern": "(</div>\\s*</div>)\\s*(<script)",
+          "replacement": "$1\n<script>\n    function openStore(){\n      console.log(\"openStore\")\n      mraid.open(\"${STORE_URL}\")\n    }\n  \n  \n  function Start() {\n      if (mraid.getState()==='loading') {\n          // If the SDK is still loading, add a listener for the 'ready' event:\n          mraid.addEventListener('ready', onSdkReady);\n          // Otherwise, if the SDK is ready, execute your function:\n      } else {\n          onSdkReady(); \n      }\n  }\n  \n  // Implement a function that shows the ad when it first renders:\n  function onSdkReady() {\n      // The viewableChange event fires if the ad container's viewability status changes.\n      // Add a listener for the viewabilityChange event, to handle pausing and resuming: \n      mraid.addEventListener('viewableChange',viewableChangeHandler);\n    // The isViewable method returns whether the ad container is viewable on the screen.\n      if (mraid.isViewable()) {\n          // If the ad container is visible, play the ad:\n          showMyAd(); \n      }\n  }\n  \n  // Implement a function for executing the ad:\n  function showMyAd() {\n      // Insert code for showing your playable ad. \n  }\n  \n  // Implement a function that handles pausing and resuming the ad based on visibility:\n  function viewableChangeHandler(viewable) {\n      if(viewable) {\n          // If the ad is viewable, show the ad:\n          showMyAd(); \n      } else {\n          // If not, pause the ad.\n      }\n  }\n  \n  \n  </script>\n$2",
+          "enabled": true
+        }
+      ],
+      "outputFilePattern": "${PRODUCT_NAME}_Unity_${LANGUAGE}.html",
+      "zipOutput": false,
+      "zipPattern": "${PRODUCT_NAME}_Unity_${LANGUAGE}.zip"
+    }
+  },
+  "languageMapping": {
+    "EN": "LanguageCode.EN",
+    "DE": "LanguageCode.DE",
+    "FR": "LanguageCode.FR",
+    "ES": "LanguageCode.ES",
+    "PT": "LanguageCode.PT",
+    "RU": "LanguageCode.RU",
+    "ID": "LanguageCode.ID"
+  },
+  "cocosCreator": {
+    "path": "/Applications/Cocos/Creator/2.4.11/CocosCreator.app/Contents/MacOS/CocosCreator",
+    "buildPlatform": "web-mobile"
+  },
+  "backup": {
+    "enabled": true,
+    "backupDir": ".backup"
+  },
+  "buildSettings": {
+    "debug": false,
+    "sourceMaps": false,
+    "md5Cache": false,
+    "autoCompile": true,
+    "excludedModules": [
+      "3D Physics/Builtin"
+    ]
+  }
+}

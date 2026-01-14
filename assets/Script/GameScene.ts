@@ -68,16 +68,16 @@ export default class GameScene extends cc.Component {
         this.initLogManager();
 
         // 设置广告平台类型
-        this.setAdType(PlayableAdType.UnityAD);
+        this.setAdType(PlayableAdType.AppLovin);
 
         // 初始化本地化管理器
-        // i18n.initialize(LanguageCode.PT);
-        // i18n.initialize(LanguageCode.RU);
-        // i18n.initialize(LanguageCode.ID);
-        // i18n.initialize(LanguageCode.ES);
-        // i18n.initialize(LanguageCode.FR);
-        // i18n.initialize(LanguageCode.EN);
-        i18n.initialize(LanguageCode.DE);
+        i18n.initialize(LanguageCode.PT);
+        // i18n.initialize(LanguageCode.XX);
+        // i18n.initialize(LanguageCode.XX);
+        // i18n.initialize(LanguageCode.XX);
+        // i18n.initialize(LanguageCode.XX);
+        // i18n.initialize(LanguageCode.XX);
+        // i18n.initialize(LanguageCode.XX);
 
 
         cc.log("[GameScene] ========================================");
