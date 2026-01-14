@@ -136,27 +136,6 @@ export default class SlotConfig extends cc.Component {
     @property({ type: cc.SpriteFrame, tooltip: "现金飞行金币图片" })
     cashCoinSprite: cc.SpriteFrame = null;
 
-    // ========== 应用商店URL ==========
-    @property({ tooltip: "iOS App Store URL" })
-    iosStoreURL: string = "https://apps.apple.com/app/id123456789";
-
-    @property({ tooltip: "Google Play Store URL" })
-    androidStoreURL: string = "https://play.google.com/store/apps/details?id=com.mafia.slots.hdfsdf.jackpot";
-
-    /**
-     * 获取当前平台的应用商店URL
-     */
-    getStoreURL(): string {
-        if (cc.sys.os === cc.sys.OS_IOS) {
-            return this.iosStoreURL;
-        } else if (cc.sys.os === cc.sys.OS_ANDROID) {
-            return this.androidStoreURL;
-        } else {
-            // 默认返回iOS链接
-            return this.iosStoreURL;
-        }
-    }
-
     /**
      * 获取单个symbol的单位高度（无间距）
      */

@@ -567,8 +567,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 754,
-      "height": 173
+      "width": 828,
+      "height": 438
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -623,7 +623,7 @@
       "__uuid__": "b61e6c19-fc35-4844-a9a3-b4e5efd2b9e0"
     },
     "_type": 0,
-    "_sizeMode": 1,
+    "_sizeMode": 0,
     "_fillType": 0,
     "_fillCenter": {
       "__type__": "cc.Vec2",
@@ -661,8 +661,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 549,
-      "height": 549
+      "width": 556,
+      "height": 556
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1270,8 +1270,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 754,
-      "height": 173
+      "width": 828,
+      "height": 438
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1326,7 +1326,7 @@
       "__uuid__": "b61e6c19-fc35-4844-a9a3-b4e5efd2b9e0"
     },
     "_type": 0,
-    "_sizeMode": 1,
+    "_sizeMode": 0,
     "_fillType": 0,
     "_fillCenter": {
       "__type__": "cc.Vec2",
@@ -1364,8 +1364,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 549,
-      "height": 549
+      "width": 556,
+      "height": 556
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -3725,8 +3725,6 @@
     "cashCoinSprite": {
       "__uuid__": "dc75e484-dcb6-422a-b4e4-e8f5bd07855b"
     },
-    "iosStoreURL": "https://apps.apple.com/app/id123456789",
-    "androidStoreURL": "https://play.google.com/store/apps/details?id=com.crazy.roil.jackpot.oqed.slots",
     "_id": "0b+1qtQm9GfZnQrXyUic5v"
   },
   {
