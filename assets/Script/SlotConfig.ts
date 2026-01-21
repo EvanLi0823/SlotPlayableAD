@@ -173,17 +173,51 @@ export default class SlotConfig extends cc.Component {
 
     /**
      * 获取Reel的X坐标数组（水平居中排列）
-     * 根据ReelArea宽度和Symbol宽度动态计算位置（无间距）
+     * 根据ReelArea宽度和Symbol宽度动态计算位置
+     *
+     * 布局说明：
+     * - ReelArea宽度：670px
+     * - Reel宽度：130px
+     * - 5个Reel总宽度：650px
+     * - 剩余空间：20px（用作左右边距或间隔）
+     *
+     * 方案1（紧密排列，两边留边距）：
+     * - 5个Reel紧密排列，总宽650px
+     * - 在670px内居中，左右各留10px边距
+     * - 第一个Reel中心X = -260, 最后一个Reel中心X = 260
+     *
+     * 方案2（均匀间隔）：
+     * - 5个Reel之间有4个间隔，每个间隔5px
+     * - 总宽度 = 130*5 + 5*4 = 670px
      */
     getReelPositionsX(): number[] {
         const positions: number[] = [];
-        const unitWidth = this.symbolWidth;
-        const totalWidth = this.symbolWidth * this.reels;
-        const startX = -totalWidth / 2 + this.symbolWidth / 2;
+
+        // 方案1：紧密排列（无间隔）
+        // const totalWidth = this.symbolWidth * this.reels; // 650
+        // const startX = -totalWidth / 2 + this.symbolWidth / 2; // -325 + 65 = -260
+
+        // 方案2：均匀间隔（推荐，视觉效果更好）
+        const spacing = 5; // Reel之间的间隔
+        const totalReelWidth = this.symbolWidth * this.reels; // 650
+        const totalSpacing = spacing * (this.reels - 1); // 20
+        const totalWidth = totalReelWidth + totalSpacing; // 670
+
+        // 起始位置（最左侧Reel的中心X坐标）
+        const startX = -totalWidth / 2 + this.symbolWidth / 2; // -335 + 65 = -270
 
         for (let i = 0; i < this.reels; i++) {
-            positions[i] = startX + i * unitWidth;
+            // 每个Reel的X坐标 = 起始位置 + i * (Reel宽度 + 间隔)
+            positions[i] = startX + i * (this.symbolWidth + spacing);
         }
+
+        // 验证计算结果
+        console.log(`[SlotConfig] Reel positions calculated:
+            - ReelArea width: ${this.reelAreaWidth}px
+            - Reel width: ${this.symbolWidth}px
+            - Spacing: ${spacing}px
+            - Total width used: ${totalWidth}px
+            - Positions: [${positions.map(x => x.toFixed(0)).join(', ')}]`);
 
         return positions;
     }
