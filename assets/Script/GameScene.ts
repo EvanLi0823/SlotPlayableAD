@@ -16,6 +16,13 @@ import LogManager from "./LogManager";
 import { i18n } from "./LocalizationManager";
 import { LanguageCode } from "./LocalizationTypes";
 
+// 导入横竖屏适配系统
+import OrientationAdaptationManager from "./adaptation/OrientationAdaptationManager";
+import { DeviceOrientation, AdaptationEvent } from "./adaptation/types/AdaptationTypes";
+import LandscapeStrategy from "./adaptation/strategies/LandscapeStrategy";
+import PortraitStrategy from "./adaptation/strategies/PortraitStrategy";
+import SafeAreaAdapter from "./adaptation/utils/SafeAreaAdapter";
+
 const { ccclass, property } = cc._decorator;
 
 /**
@@ -56,16 +63,30 @@ export default class GameScene extends cc.Component {
     @property(CashFlyAnimController)
     cashFlyAnim: CashFlyAnimController = null;
 
+    // 横竖屏适配系统配置
+    @property({ displayName: '启用横竖屏适配', tooltip: '是否启用自动横竖屏切换' })
+    enableAdaptation: boolean = true;
+
+    @property({ displayName: '启用安全区域', tooltip: '是否启用安全区域适配（刘海屏等）' })
+    enableSafeArea: boolean = true;
+
+    @property({ displayName: '适配调试模式', tooltip: '显示适配系统调试信息' })
+    adaptationDebugMode: boolean = false;
+
     // 游戏状态
     private isProcessing: boolean = false;
     private spinCount: number = 0;
     private currentResult: SpinResult | null = null;
     private logManager: LogManager = null;
     private currentAdType: PlayableAdType = PlayableAdType.AppLovin; // 当前广告平台
+    private adaptationManager: OrientationAdaptationManager = null; // 适配管理器
 
     onLoad() {
         // 初始化日志管理器（必须在所有日志之前）
         this.initLogManager();
+
+        // 初始化横竖屏适配系统（尽早初始化）
+        this.initAdaptationSystem();
 
         // 设置广告平台类型
         this.setAdType(PlayableAdType.Mtg);
@@ -120,6 +141,113 @@ export default class GameScene extends cc.Component {
         // 暴露到window对象，方便浏览器控制台调试
         (window as any).logManager = this.logManager;
         console.log("[GameScene] LogManager exposed to window.logManager");
+    }
+
+    /**
+     * 初始化横竖屏适配系统
+     */
+    private initAdaptationSystem(): void {
+        if (!this.enableAdaptation) {
+            cc.log("[GameScene] Adaptation system disabled");
+            return;
+        }
+
+        cc.log("[GameScene] Initializing orientation adaptation system...");
+
+        // 获取适配管理器实例
+        this.adaptationManager = OrientationAdaptationManager.getInstance();
+
+        // 配置管理器
+        const config = {
+            defaultOrientation: 'landscape' as DeviceOrientation,
+            enableAutoDetection: true,
+            enableSafeArea: this.enableSafeArea,
+            enableAnimation: true,
+            animationDuration: 0.3,
+            debugMode: this.adaptationDebugMode
+        };
+
+        // 初始化管理器
+        this.adaptationManager.initialize(this.node, config);
+
+        // 注册横屏策略
+        const landscapeStrategy = new LandscapeStrategy();
+        this.adaptationManager.registerStrategy('landscape' as DeviceOrientation, landscapeStrategy);
+
+        // 注册竖屏策略
+        const portraitStrategy = new PortraitStrategy();
+        this.adaptationManager.registerStrategy('portrait' as DeviceOrientation, portraitStrategy);
+
+        // 监听适配事件
+        this.adaptationManager.addEventListener(
+            'orientation-changed' as AdaptationEvent,
+            this.onOrientationChanged.bind(this)
+        );
+
+        this.adaptationManager.addEventListener(
+            'adaptation-complete' as AdaptationEvent,
+            this.onAdaptationComplete.bind(this)
+        );
+
+        // 应用安全区域（如果启用）
+        if (this.enableSafeArea) {
+            SafeAreaAdapter.setDebugMode(this.adaptationDebugMode);
+            SafeAreaAdapter.applySafeArea(this.node);
+
+            // 如果是调试模式，创建可视化调试器
+            if (this.adaptationDebugMode) {
+                SafeAreaAdapter.createSafeAreaDebugger(this.node);
+            }
+        }
+
+        // 暴露到window对象，方便调试
+        (window as any).adaptationManager = this.adaptationManager;
+
+        cc.log("[GameScene] Adaptation system initialized");
+        cc.log(`[GameScene] Current orientation: ${this.adaptationManager.getCurrentOrientation()}`);
+    }
+
+    /**
+     * 屏幕方向改变事件处理
+     */
+    private onOrientationChanged(data: any): void {
+        cc.log(`[GameScene] Orientation changed: ${data.previousOrientation} -> ${data.currentOrientation}`);
+
+        // 根据方向调整游戏逻辑（如果需要）
+        if (data.currentOrientation === 'portrait') {
+            // 竖屏特殊处理
+            this.handlePortraitMode();
+        } else {
+            // 横屏特殊处理
+            this.handleLandscapeMode();
+        }
+    }
+
+    /**
+     * 适配完成事件处理
+     */
+    private onAdaptationComplete(): void {
+        cc.log("[GameScene] Adaptation complete");
+
+        // 适配完成后的处理（如果需要）
+        // 例如：重新计算某些位置或大小
+    }
+
+    /**
+     * 处理竖屏模式
+     */
+    private handlePortraitMode(): void {
+        // 竖屏模式下的特殊处理
+        // 例如：调整游戏速度、改变交互方式等
+        cc.log("[GameScene] Switched to portrait mode");
+    }
+
+    /**
+     * 处理横屏模式
+     */
+    private handleLandscapeMode(): void {
+        // 横屏模式下的特殊处理
+        cc.log("[GameScene] Switched to landscape mode");
     }
 
     /**
