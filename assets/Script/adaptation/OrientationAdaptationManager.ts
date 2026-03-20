@@ -67,6 +67,9 @@ export default class OrientationAdaptationManager {
     // 方向检测定时器
     private detectionTimer: number = null;
 
+    // Resize事件防抖定时器
+    private resizeDebounceTimer: number = null;
+
     /**
      * 获取单例实例
      */
@@ -110,8 +113,14 @@ export default class OrientationAdaptationManager {
             this.updateSafeArea();
         }
 
-        // 检测初始方向
+        // 检测初始方向并立即应用策略
         this.detectOrientation();
+
+        // 确保初始策略被正确应用
+        if (this.currentOrientation && this.strategies.has(this.currentOrientation)) {
+            console.log(`[AdaptationManager] Applying initial strategy for ${this.currentOrientation}`);
+            this.applyCurrentStrategy();
+        }
 
         // 启动自动检测
         if (this.config.enableAutoDetection) {
@@ -198,6 +207,27 @@ export default class OrientationAdaptationManager {
     }
 
     /**
+     * 强制更新当前方向的策略
+     * 用于确保策略被正确应用（例如在节点完全加载后）
+     */
+    public forceUpdate(): void {
+        if (!this.initialized || !this.rootNode) {
+            console.warn('[AdaptationManager] Cannot force update: manager not initialized');
+            return;
+        }
+
+        if (this.currentOrientation && this.strategies.has(this.currentOrientation)) {
+            console.log(`[AdaptationManager] Force updating ${this.currentOrientation} strategy`);
+            const strategy = this.strategies.get(this.currentOrientation);
+            strategy.apply(this.rootNode);
+            this.currentStrategy = strategy;
+
+            // 发送适配完成事件
+            this.emitEvent('adaptation-complete' as AdaptationEvent);
+        }
+    }
+
+    /**
      * 添加事件监听
      * @param event 事件类型
      * @param callback 回调函数
@@ -241,13 +271,31 @@ export default class OrientationAdaptationManager {
      * 销毁管理器
      */
     public destroy(): void {
+        // 停止所有定时器
         this.stopAutoDetection();
+
+        // 清理resize防抖定时器
+        if (this.resizeDebounceTimer) {
+            clearTimeout(this.resizeDebounceTimer);
+            this.resizeDebounceTimer = null;
+        }
+
+        // 取消所有事件监听
         this.unregisterSystemEvents();
+
+        // 清理数据
         this.eventListeners.clear();
         this.strategies.clear();
         this.rootNode = null;
+        this.currentStrategy = null;
+        this.safeAreaInfo = null;
+        this.screenInfo = null;
         this.initialized = false;
+
+        // 重置单例
         OrientationAdaptationManager.instance = null;
+
+        console.log('[AdaptationManager] Manager destroyed successfully');
     }
 
     // ==================== 私有方法 ====================
@@ -268,8 +316,24 @@ export default class OrientationAdaptationManager {
      * 检测当前方向
      */
     private detectOrientation(): void {
-        const frameSize = cc.view.getFrameSize();
-        const aspectRatio = frameSize.width / frameSize.height;
+        // 优先使用 window.orientation API（移动设备）
+        if (typeof window !== 'undefined' && window.orientation !== undefined) {
+            const isLandscape = Math.abs(window.orientation) === 90;
+            const detectedOrientation = isLandscape ? 'landscape' as DeviceOrientation : 'portrait' as DeviceOrientation;
+
+            if (detectedOrientation !== this.currentOrientation) {
+                console.log(`[AdaptationManager] Orientation changed (via window.orientation): ${this.currentOrientation} -> ${detectedOrientation}`);
+                this.previousOrientation = this.currentOrientation;
+                this.currentOrientation = detectedOrientation;
+                this.applyCurrentStrategy();
+                this.emitOrientationChange();
+            }
+            return;
+        }
+
+        // 备用方案：使用 visibleSize 而不是 frameSize 检测
+        const visibleSize = cc.view.getVisibleSize();
+        const aspectRatio = visibleSize.width / visibleSize.height;
 
         let detectedOrientation: DeviceOrientation;
 
@@ -283,6 +347,7 @@ export default class OrientationAdaptationManager {
         }
 
         if (detectedOrientation !== this.currentOrientation) {
+            console.log(`[AdaptationManager] Orientation changed (via aspect ratio): ${this.currentOrientation} -> ${detectedOrientation}`);
             this.previousOrientation = this.currentOrientation;
             this.currentOrientation = detectedOrientation;
             this.applyCurrentStrategy();
@@ -346,13 +411,13 @@ export default class OrientationAdaptationManager {
      * 更新屏幕信息
      */
     private updateScreenInfo(): void {
-        const frameSize = cc.view.getFrameSize();
         const visibleSize = cc.view.getVisibleSize();
-        const aspectRatio = frameSize.width / frameSize.height;
+        const frameSize = cc.view.getFrameSize();
+        const aspectRatio = visibleSize.width / visibleSize.height;
 
-        // 判断屏幕类别
+        // 判断屏幕类别 - 使用 visibleSize 进行计算
         let category: ScreenSize;
-        const diagonal = Math.sqrt(frameSize.width * frameSize.width + frameSize.height * frameSize.height);
+        const diagonal = Math.sqrt(visibleSize.width * visibleSize.width + visibleSize.height * visibleSize.height);
 
         if (diagonal < 768) {
             category = 'phone' as ScreenSize;
@@ -432,10 +497,10 @@ export default class OrientationAdaptationManager {
             return;
         }
 
-        // 每500ms检测一次方向变化
+        // 每200ms检测一次方向变化（提高响应速度）
         this.detectionTimer = setInterval(() => {
             this.detectOrientation();
-        }, 500) as any;
+        }, 200) as any;
     }
 
     /**
@@ -454,6 +519,23 @@ export default class OrientationAdaptationManager {
     private registerSystemEvents(): void {
         // 监听窗口大小变化
         cc.view.on('canvas-resize', this.onCanvasResize, this);
+
+        // 添加原生事件监听器以提高响应性
+        if (typeof window !== 'undefined') {
+            // 绑定方法引用以便后续移除
+            this.handleOrientationChange = this.handleOrientationChange.bind(this);
+            this.handleWindowResize = this.handleWindowResize.bind(this);
+
+            // 监听设备方向变化事件（移动设备）
+            window.addEventListener('orientationchange', this.handleOrientationChange);
+
+            // 监听窗口大小变化事件（作为备用）
+            window.addEventListener('resize', this.handleWindowResize);
+
+            // 监听全屏变化事件
+            document.addEventListener('fullscreenchange', this.handleWindowResize);
+            document.addEventListener('webkitfullscreenchange', this.handleWindowResize);
+        }
     }
 
     /**
@@ -461,6 +543,43 @@ export default class OrientationAdaptationManager {
      */
     private unregisterSystemEvents(): void {
         cc.view.off('canvas-resize', this.onCanvasResize, this);
+
+        // 移除原生事件监听器
+        if (typeof window !== 'undefined') {
+            window.removeEventListener('orientationchange', this.handleOrientationChange);
+            window.removeEventListener('resize', this.handleWindowResize);
+            document.removeEventListener('fullscreenchange', this.handleWindowResize);
+            document.removeEventListener('webkitfullscreenchange', this.handleWindowResize);
+        }
+    }
+
+    /**
+     * 处理原生方向改变事件
+     */
+    private handleOrientationChange: () => void = () => {
+        console.log('[AdaptationManager] Native orientation change detected');
+        // 延迟执行，等待浏览器完成旋转动画
+        setTimeout(() => {
+            this.updateScreenInfo();
+            this.updateSafeArea();
+            this.detectOrientation();
+        }, 100);
+    }
+
+    /**
+     * 处理窗口大小改变事件
+     */
+    private handleWindowResize: () => void = () => {
+        console.log('[AdaptationManager] Window resize detected');
+        // 使用防抖处理频繁的resize事件
+        if (this.resizeDebounceTimer) {
+            clearTimeout(this.resizeDebounceTimer);
+        }
+        this.resizeDebounceTimer = setTimeout(() => {
+            this.updateScreenInfo();
+            this.updateSafeArea();
+            this.detectOrientation();
+        }, 150) as any;
     }
 
     /**

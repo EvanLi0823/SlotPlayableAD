@@ -76,8 +76,22 @@ export default class LandscapeStrategy implements AdaptationStrategy {
         const canvas = rootNode.getComponent(cc.Canvas);
         if (canvas) {
             canvas.designResolution = this.config.designResolution;
-            canvas.fitHeight = this.config.fitMode.fitHeight;
-            canvas.fitWidth = this.config.fitMode.fitWidth;
+
+            // 根据平台优化适配模式
+            if (cc.sys.isMobile) {
+                // 移动设备：确保内容始终完整显示
+                // 使用 SHOW_ALL 模式避免内容被裁剪
+                canvas.fitHeight = true;
+                canvas.fitWidth = true;
+
+                console.log('[LandscapeStrategy] Mobile device detected, using SHOW_ALL mode');
+            } else {
+                // 桌面设备：使用原配置
+                canvas.fitHeight = this.config.fitMode.fitHeight;
+                canvas.fitWidth = this.config.fitMode.fitWidth;
+
+                console.log('[LandscapeStrategy] Desktop device detected, using configured fit mode');
+            }
         }
     }
 

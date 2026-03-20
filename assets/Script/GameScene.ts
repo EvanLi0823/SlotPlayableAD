@@ -92,13 +92,13 @@ export default class GameScene extends cc.Component {
         this.setAdType(PlayableAdType.Mtg);
 
         // 初始化本地化管理器
-        i18n.initialize(LanguageCode.RU);
+        // i18n.initialize(LanguageCode.RU);
         // i18n.initialize(LanguageCode.PT);
         // i18n.initialize(LanguageCode.EN);
         // i18n.initialize(LanguageCode.DE);
         // i18n.initialize(LanguageCode.ID);
         // i18n.initialize(LanguageCode.ES);
-        // i18n.initialize(LanguageCode.FR);
+        i18n.initialize(LanguageCode.FR);
 
 
         cc.log("[GameScene] ========================================");
@@ -202,6 +202,16 @@ export default class GameScene extends cc.Component {
 
         // 暴露到window对象，方便调试
         (window as any).adaptationManager = this.adaptationManager;
+
+        // 延迟一帧以确保所有节点都已加载完成
+        this.scheduleOnce(() => {
+            // 强制应用当前方向的策略
+            const currentOrientation = this.adaptationManager.getCurrentOrientation();
+            if (currentOrientation !== 'unknown') {
+                cc.log(`[GameScene] Applying initial ${currentOrientation} strategy`);
+                this.adaptationManager.forceUpdate();
+            }
+        }, 0);
 
         cc.log("[GameScene] Adaptation system initialized");
         cc.log(`[GameScene] Current orientation: ${this.adaptationManager.getCurrentOrientation()}`);
